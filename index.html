@@ -1,77 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PSC Helper Registration</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-    body {
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; margin: 0;
-      background: linear-gradient(135deg, #6D28D9, #9D4EDD);
-    }
-    .container {
-      background: #fff; padding: 30px 40px; border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2); max-width: 400px; width: 100%;
-      text-align: center;
-    }
-    h2 { margin-bottom: 20px; color: #6D28D9; }
-    input {
-      width: 100%; padding: 12px; margin: 10px 0;
-      border: 1px solid #ccc; border-radius: 8px; font-size: 16px;
-    }
-    button {
-      background: #6D28D9; color: #fff; padding: 12px;
-      border: none; border-radius: 8px; width: 100%;
-      font-size: 16px; cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover { background: #9D4EDD; }
-    .success { color: green; margin-top: 10px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSC Helper Registration</title>
+<style>
+  body { display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; background:linear-gradient(135deg,#6D28D9,#9D4EDD); font-family:Arial,sans-serif; }
+  .container { background:#fff; padding:30px 40px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.2); max-width:400px; width:100%; text-align:center; }
+  h2 { margin-bottom:20px; color:#6D28D9; }
+  input { width:100%; padding:12px; margin:10px 0; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+  button { background:#6D28D9; color:#fff; padding:12px; border:none; border-radius:8px; width:100%; font-size:16px; cursor:pointer; transition:0.3s; }
+  button:hover { background:#9D4EDD; }
+  .success { color:green; margin-top:10px; }
+
+  /* Modal Styles */
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:999; }
+  .modal-content { background:#fff; padding:20px 30px; border-radius:12px; max-width:350px; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+  .modal h3 { margin-top:0; color:#6D28D9; }
+  .modal button { margin-top:15px; background:#6D28D9; color:#fff; padding:10px 15px; border:none; border-radius:8px; cursor:pointer; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>PSC Helper Registration</h2>
-    <form id="pscForm">
-      <input type="text" name="name" placeholder="Full Name" required>
-      <input type="text" name="place" placeholder="Place" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="tel" name="whatsapp" placeholder="WhatsApp Number" required pattern="[0-9]{10,15}">
-      <button type="submit">Submit</button>
-    </form>
-    <div class="success" id="successMsg"></div>
+
+<div class="container">
+  <h2>PSC Helper Registration</h2>
+  <form id="pscForm">
+    <input type="text" name="name" placeholder="Full Name" required>
+    <input type="text" name="place" placeholder="Place" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="tel" name="whatsapp" placeholder="WhatsApp Number" required pattern="[0-9]{10,15}">
+    <button type="submit">Submit</button>
+  </form>
+  <div class="success" id="successMsg"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="installModal">
+  <div class="modal-content" id="modalContent">
+    <h3>Install PSC Helper</h3>
+    <p id="modalText"></p>
+    <button id="modalClose">Continue to Site</button>
   </div>
+</div>
 
-  <script>
-    const form = document.getElementById('pscForm');
-    const successMsg = document.getElementById('successMsg');
+<script>
+const form = document.getElementById('pscForm');
+const successMsg = document.getElementById('successMsg');
+const installModal = document.getElementById('installModal');
+const modalText = document.getElementById('modalText');
+const modalClose = document.getElementById('modalClose');
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwc4zb3iRghyPkTdsDcZN_exTjcH5t5SN5y2yibfmim22_tsiWqSZXSPMwnz_9r69an/exec';
+let deferredPrompt;
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
 
-      fetch('https://script.google.com/macros/s/AKfycbxul9eN8RVFGcWagJ6jOKV-sByKbuCaerjl4Fv5Yg12BidVHAqYsoGlOsLx6s-nHyJD/exec', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(res => res.json())
-      .then(resp => {
-        if(resp.result === 'success') {
-          successMsg.textContent = 'Registration Successful! Redirecting...';
-          setTimeout(() => {
-            window.location.href = 'https://psc-fr.vercel.app/';
-          }, 1500);
-        } else {
-          successMsg.textContent = 'Error submitting form!';
-        }
-      })
-      .catch(err => { successMsg.textContent = 'Submission failed!'; console.error(err); });
+function isIos() { return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()); }
+function isAndroid() { return /android/.test(navigator.userAgent.toLowerCase()); }
+function isWindows() { return /windows/.test(navigator.userAgent.toLowerCase()); }
+
+function showInstallModal() {
+  let text = "";
+  if (isIos()) {
+    text = "iOS detected! You can install PSC Helper via the share icon → 'Add to Home Screen'.";
+  } else if (isAndroid() && deferredPrompt) {
+    text = "Android detected! Click 'Install' to add PSC Helper to your home screen.";
+    deferredPrompt.prompt();
+  } else if (isWindows()) {
+    text = "Windows detected! Install PSC Helper via browser menu → 'Install App' or create a shortcut.";
+  } else {
+    text = "You can continue to the site or install PSC Helper if supported by your device.";
+  }
+  modalText.textContent = text;
+  installModal.style.display = "flex";
+}
+
+// Modal continue button
+modalClose.addEventListener('click', () => {
+  installModal.style.display = "none";
+  window.location.href = "https://psc-fr.vercel.app/";
+});
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      redirect: "follow"
     });
-  </script>
+    const result = await res.json();
+
+    if (result.status === "success") {
+      successMsg.textContent = "Registration Successful! Preparing installation instructions...";
+      
+      // 20s delay then show modal
+      setTimeout(() => {
+        showInstallModal();
+      }, 20000);
+
+      // Ensure redirect happens after 40s if user doesn't click
+      setTimeout(() => {
+        window.location.href = "https://psc-fr.vercel.app/";
+      }, 40000);
+
+    } else {
+      successMsg.textContent = "Error submitting form!";
+    }
+  } catch (err) {
+    successMsg.textContent = "Submission failed!";
+    console.error(err);
+  }
+});
+</script>
 </body>
 </html>

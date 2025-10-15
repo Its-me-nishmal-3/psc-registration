@@ -64,20 +64,20 @@ function isWindows() { return /windows/.test(navigator.userAgent.toLowerCase());
 function showInstallModal() {
   let text = "";
   if (isIos()) {
-    text = "iOS detected! You can install PSC Helper via the share icon → 'Add to Home Screen'.";
+    text = "iOS detected! To install PSC Helper, tap the share icon → 'Add to Home Screen'.";
   } else if (isAndroid() && deferredPrompt) {
     text = "Android detected! Click 'Install' to add PSC Helper to your home screen.";
     deferredPrompt.prompt();
   } else if (isWindows()) {
     text = "Windows detected! Install PSC Helper via browser menu → 'Install App' or create a shortcut.";
   } else {
-    text = "You can continue to the site or install PSC Helper if supported by your device.";
+    text = "You can continue to the site or install PSC Helper if supported.";
   }
   modalText.textContent = text;
   installModal.style.display = "flex";
 }
 
-// Modal continue button
+// Modal button
 modalClose.addEventListener('click', () => {
   installModal.style.display = "none";
   window.location.href = "https://psc-fr.vercel.app/";
@@ -98,17 +98,15 @@ form.addEventListener('submit', async e => {
     const result = await res.json();
 
     if (result.status === "success") {
-      successMsg.textContent = "Registration Successful! Preparing installation instructions...";
+      successMsg.textContent = "Registration Successful!";
       
-      // 20s delay then show modal
-      setTimeout(() => {
-        showInstallModal();
-      }, 20000);
+      // Show modal immediately
+      showInstallModal();
 
-      // Ensure redirect happens after 40s if user doesn't click
+      // Auto redirect after 20s
       setTimeout(() => {
         window.location.href = "https://psc-fr.vercel.app/";
-      }, 40000);
+      }, 20000);
 
     } else {
       successMsg.textContent = "Error submitting form!";
